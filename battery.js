@@ -13,6 +13,7 @@ window.onload = function () {
         function func(){
             collectBatteryData(batteryObject);
         }
+        alert(batteryObject.charging);
     }
     function timerDecrement(){
         min="2";
