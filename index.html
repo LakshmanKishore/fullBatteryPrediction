@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./battery.css">
+    <script src="./battery.js"></script>
+    <script src="https://unpkg.com/mathjs@9.4.2/lib/browser/math.js"></script>
+    <script src='https://cdn.plot.ly/plotly-2.0.0.min.js'></script>
+    <!-- Import TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+    <!-- Import tfjs-vis -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis@1.0.2/dist/tfjs-vis.umd.min.js"></script>
+
+    <title>Full Battery Prediction</title>
+</head>
+
+<body>
+    <h1>Full Battery Time Prediction</h1>
+    <div id='myDiv'><!-- Plotly chart will be drawn inside this DIV --></div>
+    <!-- <div style="width:500px">
+        <canvas id="myChart" width="400" height="400"></canvas>
+    </div> -->
+    <div class="timer" hidden="true">2 : 0</div>
+    <button class="collectDataButton">Collect Data</button>
+    <button class="predictTimeButton">Predict Time</button>
+    <div class="equation">Equation</div>
+    <div class="data">Data</div>
+</body>
+
+</html>
