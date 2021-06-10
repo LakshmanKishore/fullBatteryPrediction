@@ -37,7 +37,7 @@ window.onload = function () {
     let time = math.range(0,125, 5).toArray();
 
     function collectBatteryData(batteryObject) {
-        if (batteryObject.charging) {
+        if (!batteryObject.charging) {
             alert("Please connect the charger for collecting the Data");
         } else {
             timer.hidden=false;
