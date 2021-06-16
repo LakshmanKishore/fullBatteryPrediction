@@ -1,6 +1,7 @@
 window.onload = function () {
-    //Collecting the data from the user 
+    let equation = document.querySelector(".equation");
 
+    //Collecting the data from the user 
     let batteryPromise = navigator.getBattery();
     batteryPromise.then(batteryCallback);
 
@@ -9,137 +10,87 @@ window.onload = function () {
     let dataOnScreen = document.querySelector(".data");
 
     function batteryCallback(batteryObject) {
-        collectDataButton.addEventListener("click",func)
-        function func(){
+        collectDataButton.addEventListener("click", func)
+        function func() {
             collectBatteryData(batteryObject);
         }
-        alert(batteryObject.charging);
     }
-    function timerDecrement(){
-        min="2";
-        sec="0";
+
+    function timerDecrement() {
+        min = "2";
+        sec = "0";
         decrement = setInterval(() => {
-            if (sec=="0") {
-                minNumber=Number(min)
-                min=String(--minNumber);
-                sec="59";
+            if (sec == "0") {
+                minNumber = Number(min)
+                min = String(--minNumber);
+                sec = "59";
             } else {
-                secNumber=Number(sec);
-                sec=String(--secNumber);    
+                secNumber = Number(sec);
+                sec = String(--secNumber);
             }
-            timer.innerText = min+" : "+sec;
+            timer.innerText = min + " : " + sec;
         }, 1000);
         setTimeout(() => {
             clearInterval(decrement);
-            timer.hidden=true;
-        }, 120000);
+            timer.hidden = true;
+        }, 121000);
     }
     let batteryLevel = [];
-    let time = math.range(0,125, 5).toArray();
+    let time = math.range(0, 125, 5).toArray();
 
     function collectBatteryData(batteryObject) {
         if (!batteryObject.charging) {
             alert("Please connect the charger for collecting the Data");
         } else {
-            timer.hidden=false;
+            timer.hidden = false;
             timerDecrement();
+            batteryLevel.push(batteryObject.level);
             collectData = setInterval(function () {
                 batteryLevel.push(batteryObject.level);
                 // minutes = new Date().getTime();
                 // time.push(minutes);
                 console.log(batteryLevel);
                 console.log(time);
-                dataOnScreen.innerText = batteryLevel+"\n"+time;
+                dataOnScreen.innerText = batteryLevel + "\n" + time;
             }, 5000)
-            setTimeout(function(){
+            setTimeout(function () {
                 clearInterval(collectData);
-                timer.hidden=true;
-            },120000)
+                timer.hidden = true;
+            }, 121000)
         }
     }
     //time=slope*100(batteryLevel)+b
 
+    const trainX = batteryLevel;
+    // const trainX = [0.55, 0.56, 0.56, 0.56, 0.56, 0.56, 0.56, 0.56, 0.56, 0.56, 0.56, 0.56, 0.56, 0.57, 0.57, 0.57, 0.57, 0.57, 0.57, 0.57, 0.57, 0.57, 0.57, 0.57, 0.58];
+    const trainY = time;
+    // console.log(trainY);
     //Prediction logic
-    //Using Linear Regression and Stochastic gradient descent from Tensorflow js
-    const trainX = [
-        3.3,
-        4.4,
-        5.5,
-        6.71,
-        6.93,
-        4.168,
-        9.779,
-        6.182,
-        7.59,
-        2.167,
-        7.042,
-        10.791,
-        5.313,
-        7.997,
-        5.654,
-        9.27,
-        3.1
-    ];
-    const trainY = [
-        1.7,
-        2.76,
-        2.09,
-        3.19,
-        1.694,
-        1.573,
-        3.366,
-        2.596,
-        2.53,
-        1.221,
-        2.827,
-        3.465,
-        1.65,
-        2.904,
-        2.42,
-        2.94,
-        1.3
-    ];
 
-    const m = tf.variable(tf.scalar(Math.random()));
-    const b = tf.variable(tf.scalar(Math.random()));
+    let m = 0;
+    let b = 0;
 
-    let equation = document.querySelector(".equation");
+    function linearRegression() {
+        // y=mx+b;
+        let XX = [];
+        for (let i = 0; i < trainX.length; i++) {
+            XX[i] = [trainX[i], 1];
+        }
+        // console.log(XX);
+        // Linear regression using OLS(Ordinary Least Squares)
+        let theta = math.multiply(math.inv(math.multiply(math.transpose(XX), XX)), math.multiply(math.transpose(XX), trainY))
 
-    function predict(x) {
-        return tf.tidy(function () {
-            return m.mul(x).add(b);
-        });
+        m = theta[0];
+        b = theta[1];
+        console.log(m, b);
+        equation.innerText = "Y = " + m + "x + " + b
     }
-
-    function loss(prediction, labels) {
-        //subtracts the two arrays & squares each element of the tensor then finds the mean.
-        const error = prediction
-            .sub(labels)
-            .square()
-            .mean();
-        return error;
-    }
-
-    function train() {
-        const learningRate = 0.005;
-        const optimizer = tf.train.sgd(learningRate);
-
-        optimizer.minimize(function () {
-            const predsYs = predict(tf.tensor1d(trainX));
-            console.log(predsYs);
-            stepLoss = loss(predsYs, tf.tensor1d(trainY));
-            console.log(stepLoss.dataSync()[0]);
-            return stepLoss;
-        });
-        plot();
-        equation.innerText = "Y = " + m.dataSync()[0] + "X + " + b.dataSync()[0]
-    }
-    const predictionsBefore = predict(tf.tensor1d(trainX));
-    equation.innerText = "Y = " + m.dataSync()[0] + "X + " + b.dataSync()[0]
 
     function plot() {
-        const px = math.range(0, Math.round(Math.max.apply(null, trainX)) + 2, 0.5).toArray();
-        const py = px.map(x => (m.dataSync()[0] * x + b.dataSync()[0]))
+        const px = [Math.min.apply(null, trainX), Math.max.apply(null, trainX)];
+        const py = px.map(x => (m * x + b));
+        console.log(px, py)
+
         var trace1 = {
             x: trainX,
             y: trainY,
@@ -155,17 +106,15 @@ window.onload = function () {
         }
 
         var data = [trace1, trace2];
-
+        // console.log(data);
         Plotly.newPlot('myDiv', data);
     }
     plot();
 
     let predictTime = document.querySelector(".predictTimeButton");
-    predictTime.addEventListener("click", trainWithEpoch);
-    function trainWithEpoch(){
-        for(let i=0;i<100;i++){
-            setTimeout(train,10);
-        }
+    predictTime.addEventListener("click", train);
+    function train() {
+        linearRegression();
         predictTime.removeEventListener("click", trainWithEpoch);
     }
 }
