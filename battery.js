@@ -20,11 +20,7 @@ window.onload = function () {
     function batteryCallback(batteryObject) {
         collectDataButton.addEventListener("click", func)
         function func() {
-            collectDataButton.hidden = true;
-            instruction.hidden = true;
-            heading.innerText = "Collecting the Data . . .";
             collectBatteryData(batteryObject);
-            collectDataButton.removeEventListener("click", func);
         }
     }
 
@@ -52,10 +48,13 @@ window.onload = function () {
     let time = math.range(0, 125, 5).toArray();
 
     function collectBatteryData(batteryObject) {
-        if (!batteryObject.charging) {
+        if (batteryObject.charging) {
             alert("Please connect the charger for collecting the Data");
         } else {
             timerDisplay.hidden = false;
+            collectDataButton.hidden = true;
+            instruction.hidden = true;
+            heading.innerText = "Collecting the Data . . .";
             timerDecrement();
             batteryLevel.push(batteryObject.level * 100);
             collectData = setInterval(function () {
